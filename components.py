@@ -26,9 +26,8 @@ class Student(object):
         - `group`: a Group reference
         """
 
-        if self.group!=None:
-            self.group.remove_student(self)
-            self.group=None
+        self.__rem_group()
+
         # self.group == None
         group.add_student(self)
 
@@ -37,6 +36,20 @@ class Student(object):
         """
 
         return self.group==group
+
+    def __rem_group(self):
+        """
+        """
+        if self.group!=None:
+            self.group.remove_student(self)
+            self.group=None
+
+    def send_down(self):
+        """Sends down the student from its group and university.
+        """
+
+        self.__rem_group()
+
 
 
 @implementer(IGroup)
@@ -75,6 +88,15 @@ class Group(object):
         """
         return len(self.students)
 
+    def disperse(self):
+        """Remove all the students from the group.
+        """
+
+        students=self.students[:]
+        for s in students:
+            self.remove_student(s)
+
+
 
 # provides = обслуживать, оснащать (экземпляры)
 # implements = реализует (классы)
@@ -102,10 +124,13 @@ def test1():
     assert g2.size()==2
     assert g1.size()==1
 
-    s3.send_down()
-    assert s3.group==None
+    assert s1.belongs_to(g1)
+    s1.send_down()
+    assert s1.group==None
     assert g1.size()==0
 
+    g2.disperse()
+    assert g2.size()==0
 
 if __name__=="__main__":
     test1()
