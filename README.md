@@ -1,2 +1,2 @@
 # zca-students
-Student domai
+Student domain laboratory sandbox.
