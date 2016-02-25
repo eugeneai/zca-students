@@ -42,9 +42,10 @@ class IStorage(Interface):
     def store(obj):
         """Store an obj[ect] into self"""
 
-    def get(obj_id):
+    def get(obj_id, class_):
         """Retrieve an object from self.
-        The object identified by obj_id.
+        The object identified by obj_id and
+        wrapped as class_.
         """
 
 class IDictionaryStorage(IStorage):

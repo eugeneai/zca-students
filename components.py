@@ -7,16 +7,19 @@ class Student(object):
     """Implements IStudent interface
     """
 
-    def __init__(self, name, doc, group):
+    def __init__(self, name=None, doc=None, group=None,
+        stub=False):
         """Initializes a student data.
         name is a given name and familyname of the student.
         doc is the number of student's document.
         """
-
-        self.name=name
-        self.doc=doc
-        self.group=None
-        self.move(group)
+        if stub:
+            pass
+        else:
+            self.name=name
+            self.doc=doc
+            self.group=None
+            self.move(group)
 
     def __eq__(self, other):
         if self.name != other.name:
@@ -58,6 +61,15 @@ class Student(object):
 
         self.__rem_group()
 
+    def __eq__(self, other):
+        if self.doc!=other.doc:
+            return False
+        if self.name!=other.name:
+            return False
+        #if self.group!=other.group:
+        #    return False
+
+        return True
 
 
 @implementer(IGroup)
@@ -65,11 +77,14 @@ class Group(object):
     """Implements a group of students
     """
 
-    def __init__(self, name):
+    def __init__(self, name=None, stub=False):
         """Initializes group data
         """
+        if stub:
+            pass
+        else:
+            self.name=name
         self.students=[]
-        self.name=name
 
     def add_student(self, student):
         """Adds a student to the group
@@ -105,6 +120,14 @@ class Group(object):
         for s in students:
             self.remove_student(s)
 
+    def __eq__(self, other):
+        if self.name!=other.name:
+            return False
+        for i, s in enumerate(self.students):
+            if s!=other.students[i]:
+                return False
+        return True
+
 @implementer(IDictionaryStorage)
 class DictionaryStorage(object):
     """Stores objects in a dictionary
@@ -119,7 +142,7 @@ class DictionaryStorage(object):
         o=IDictionaryStorable(obj)
         return o.store_in(self)
 
-    def get(self, obj_id):
+    def get(self, obj_id, class_=None):
         return self.storage[obj_id]
 
     def get_id(self):
@@ -218,8 +241,8 @@ def test_students(storage):
     assert id_g1!=None
     assert id_g2!=None
 
-    _g1=storage.get(id_g1)
-    _g2=storage.get(id_g2)
+    _g1=storage.get(id_g1, Group)
+    _g2=storage.get(id_g2, Group)
     assert _g1==g1
     assert _g2==g2
 

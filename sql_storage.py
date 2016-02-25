@@ -2,7 +2,7 @@ import sqlite3 as sql
 from interfaces import *
 from zope.component import adapter, getGlobalSiteManager
 from zope.interface import implementer
-from components import test_students
+from components import test_students, Group, Student
 
 @implementer(ISQLiteStorage)
 class SQLiteStorage(object):
@@ -21,8 +21,14 @@ class SQLiteStorage(object):
         o=ISQLiteStorable(obj)
         return o.store_in(self)
 
-    def get(self, obj_id):
-        pass
+    def get(self, obj_id, class_):
+        obj=class_(stub=True)
+        o=ISQLiteStorable(obj)
+        try:
+            o.get_from(self, obj_id)
+        except KeyError:
+            return None
+        return obj
 
     def create_tables(self):
         cur=self.conn.cursor()
@@ -69,6 +75,18 @@ class IStudentToISQLiteStorableAdapter(object):
         conn.commit()
         return rc
 
+    def get_from(self, storage, obj_id):
+        conn=storage.conn
+        cur=conn.cursor()
+        cur.execute("""
+                    SELECT * FROM Students
+                    WHERE
+                    rowid=?""", (obj_id,))
+        data=cur.fetchone()
+        name, doc, _=data
+        s=Student(name=name, doc=doc)
+        s.sql_id=obj_id
+
 @implementer(ISQLiteStorable)
 @adapter(IGroup)
 class IGroupToISQLStorableAdapter(object):
@@ -89,6 +107,28 @@ class IGroupToISQLStorableAdapter(object):
         for s in self.group.students:
             storage.store(s)
         return rc
+
+    def get_from(self, storage, obj_id):
+        conn=storage.conn
+        cur=conn.cursor()
+        cur.execute("""SELECT * FROM Groups
+                    WHERE
+                    rowid=?""", (obj_id,))
+        rc=cur.fetchone()
+        if rc:
+            self.group.name=rc[0]
+            cur.execute("""SELECT rowid,* FROM Students
+                        WHERE
+                        group_id=?
+                        """, (obj_id,))
+            rows=cur.fetchall()
+            for srowid, name, doc, _ in rows:
+                s=Student(name=name, doc=doc,
+                    group=self.group)
+                s.sql_id=srowid
+            self.group.sql_id=obj_id
+
+
 
 GSM=getGlobalSiteManager()
 GSM.registerAdapter(IGroupToISQLStorableAdapter)
