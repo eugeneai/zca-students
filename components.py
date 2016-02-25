@@ -1,7 +1,6 @@
 from interfaces import *
 from zope.interface import implementer
-
-
+from zope.component import adapter, getGlobalSiteManager
 
 @implementer(IStudent)
 class Student(object):
@@ -18,6 +17,15 @@ class Student(object):
         self.doc=doc
         self.group=None
         self.move(group)
+
+    def __eq__(self, other):
+        if self.name != other.name:
+            return False
+
+        if self.doc != other.doc:
+            return False
+
+        return True
 
     def move(self, group):
         """Transfer the student to new group.
@@ -61,6 +69,7 @@ class Group(object):
         """Initializes group data
         """
         self.students=[]
+        self.name=name
 
     def add_student(self, student):
         """Adds a student to the group
@@ -96,13 +105,88 @@ class Group(object):
         for s in students:
             self.remove_student(s)
 
+@implementer(IDictionaryStorage)
+class DictionaryStorage(object):
+    """Stores objects in a dictionary
+    """
 
+    def __init__(self, storage):
+        """
+        """
+        self.storage=storage
+
+    def store(self, obj):
+        o=IDictionaryStorable(obj)
+        return o.store_in(self)
+
+    def get(self, obj_id):
+        return self.storage[obj_id]
+
+    def get_id(self):
+        return len(self.storage)
+
+@implementer(IDictionaryStorable)
+@adapter(IGroup)
+class IGroupToIDictionaryStorableAdapter(object):
+    """This adapter stores groups in a dictionary.
+    """
+
+    def __init__(self, group):
+        assert IGroup.providedBy(group)
+        self.group=group
+
+    def store_in(self, storage):
+        """Stores self into a dictionary storage
+
+        Arguments:
+        - `storage`: A dictionary storage, where the
+        objects to be stored.
+        """
+
+        # Store all students
+        students=self.group.students
+        for s in students:
+            s_id=storage.store(s)
+
+        # Store group
+        obj_id=storage.get_id()
+        storage.storage[obj_id]=self.group
+        self.group.dict_id=obj_id
+        return obj_id
+
+@implementer(IDictionaryStorable)
+@adapter(IStudent)
+class IStudentToIDictionaryStorableAdapter(object):
+    """
+    """
+
+    def __init__(self, student):
+        """
+        """
+        assert IStudent.providedBy(student)
+        self.student=student
+
+    def store_in(self, storage):
+        obj_id=storage.get_id()
+        storage.storage[obj_id]=self.student
+        self.student.dict_id=obj_id
+        return obj_id
+
+
+GSM=getGlobalSiteManager()
+GSM.registerAdapter(IGroupToIDictionaryStorableAdapter)
+GSM.registerAdapter(IStudentToIDictionaryStorableAdapter)
 
 # provides = обслуживать, оснащать (экземпляры)
 # implements = реализует (классы)
 
 
-def test1():
+
+
+
+
+
+def test_students(storage):
     assert IGroup.implementedBy(Group), "This class does not provide IGroup"
     assert IStudent.implementedBy(Student), "This class does not provide IGroup"
 
@@ -129,10 +213,31 @@ def test1():
     assert s1.group==None
     assert g1.size()==0
 
+    id_g1=storage.store(g1)
+    id_g2=storage.store(g2)
+    assert id_g1!=None
+    assert id_g2!=None
+
+    _g1=storage.get(id_g1)
+    _g2=storage.get(id_g2)
+    assert _g1==g1
+    assert _g2==g2
+
     g2.disperse()
     assert g2.size()==0
 
+    g1.disperse()
+    assert g1.size()==0
+
+
+def test_storage():
+    assert IStorage.implementedBy(DictionaryStorage)
+    assert IDictionaryStorage.implementedBy(DictionaryStorage)
+    storage=DictionaryStorage({})
+    test_students(storage)
+
+
 if __name__=="__main__":
-    test1()
+    test_storage()
     print("Ok")
     quit()

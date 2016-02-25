@@ -33,3 +33,39 @@ class IGroup(Interface):
 
     def disperse():
         """Remove all the student from the group"""
+
+class IStorage(Interface):
+    """Defines interface for components that
+    store objects in a pistent media.
+    """
+
+    def store(obj):
+        """Store an obj[ect] into self"""
+
+    def get(obj_id):
+        """Retrieve an object from self.
+        The object identified by obj_id.
+        """
+
+class IDictionaryStorage(IStorage):
+    """Defines storage implemented with a python dictionary.
+    """
+
+    def get_id():
+        """Allocates an id for a storable object."""
+
+class IDictionaryStorable(Interface):
+    """
+    """
+
+    def store_in(storage):
+        """Stores itself into a storage
+        """
+
+class ISQLiteStorage(Interface):
+    """Denote SQLite storage
+    """
+
+class ISQLiteStorable(Interface):
+    """
+    """
