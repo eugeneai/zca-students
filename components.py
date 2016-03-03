@@ -51,7 +51,7 @@ class Student(object):
     def __rem_group(self):
         """
         """
-        if self.group!=None:
+        if not self.group is None:
             self.group.remove_student(self)
             self.group=None
 
@@ -71,6 +71,10 @@ class Student(object):
 
         return True
 
+    def __eq__(self, other):
+        if self.name!=other.name or self.doc!=other.doc:
+            return False
+        return True
 
 @implementer(IGroup)
 class Group(object):
@@ -123,9 +127,10 @@ class Group(object):
     def __eq__(self, other):
         if self.name!=other.name:
             return False
-        for i, s in enumerate(self.students):
-            if s!=other.students[i]:
-                return False
+        ss=set([(s.name,s.doc) for s in self.students])
+        so=set([(s.name,s.doc) for s in other.students])
+        if ss!=so:
+            return False
         return True
 
 @implementer(IDictionaryStorage)
@@ -244,6 +249,10 @@ def test_students(storage):
     _g1=storage.get(id_g1, Group)
     _g2=storage.get(id_g2, Group)
     assert _g1==g1
+    print ("Loaded  : ", _g2)
+    print ("Original: ", g2)
+
+    import pdb; pdb.set_trace()
     assert _g2==g2
 
     g2.disperse()

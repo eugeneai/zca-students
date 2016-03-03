@@ -85,7 +85,7 @@ class AdapterOfIStudentToISQLiteStorable(object):
                     rowid=?""", (obj_id,))
         data=cur.fetchone()
         name, doc, _=data
-        s=Student(name=name, doc=doc)
+        s=Student(name=name, doc=int(doc))
         s.sql_id=obj_id
 
 #@implementer(ISQLiteStorable)
@@ -124,7 +124,7 @@ class AdapterOfIGroupToISQLiteStorable(object):
                         """, (obj_id,))
             rows=cur.fetchall()
             for srowid, name, doc, _ in rows:
-                s=Student(name=name, doc=doc,
+                s=Student(name=name, doc=int(doc),
                     group=self.group)
                 s.sql_id=srowid
             self.group.sql_id=obj_id
@@ -141,6 +141,10 @@ def test_sore():
 if __name__=="__main__":
     from zope.configuration.xmlconfig import xmlconfig
     xmlconfig(open("config.zcml","r"))
+    print("""
+
+
+          """)
     test_sore()
     print ("Ok")
     quit()
