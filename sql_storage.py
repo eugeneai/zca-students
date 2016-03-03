@@ -134,7 +134,7 @@ storage=SQLiteStorage("university_test.db")
 
 
 def test_sore():
-    s=getUtility(ISQLiteStorage)
+    s=getUtility(ISQLiteStorage, name="storage")
     test_students(s)
 
 

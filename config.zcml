@@ -13,14 +13,10 @@
       provides="interfaces.ISQLiteStorable"
       factory="sql_storage.AdapterOfIStudentToISQLiteStorable"
       />
-  <!--
-  <adapter
-      factory="sql_storage.AdapterOfIStudentToISQLiteStorable"
-      />
-  -->
   <utility
       component="sql_storage.storage"
       provides="interfaces.ISQLiteStorage"
+      name="storage"
       />
 
 </configure>
