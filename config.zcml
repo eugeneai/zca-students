@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configure xmlns='http://namespaces.zope.org/zope'
+           i18n_domain="zope">
+  <adapter
+      for="interfaces.IGroup"
+      provides="interfaces.ISQLStorable"
+      factory="sql_storage.AdapterOfIGroupToISQLStorable"
+      />
+
+  <adapter
+      for="interfaces.IStudent"
+      provides="interfaces.ISQLStorable"
+      factory="sql_storage.AdapterOfIStudentToISQLStorable"
+      />
+
+</configure>

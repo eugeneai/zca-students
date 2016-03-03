@@ -1,6 +1,6 @@
 import sqlite3 as sql
 from interfaces import *
-from zope.component import adapter, getGlobalSiteManager
+#from zope.component import adapter, getGlobalSiteManager
 from zope.interface import implementer
 from components import test_students, Group, Student
 
@@ -51,9 +51,9 @@ class SQLiteStorage(object):
             """)
         self.conn.commit()
 
-@implementer(ISQLiteStorable)
-@adapter(IStudent)
-class IStudentToISQLiteStorableAdapter(object):
+#@implementer(ISQLiteStorable)
+#@adapter(IStudent)
+class AdapterOfIStudentToISQLiteStorable(object):
     table="Students"
     def __init__(self, student):
         self.student=student
@@ -87,9 +87,9 @@ class IStudentToISQLiteStorableAdapter(object):
         s=Student(name=name, doc=doc)
         s.sql_id=obj_id
 
-@implementer(ISQLiteStorable)
-@adapter(IGroup)
-class IGroupToISQLStorableAdapter(object):
+#@implementer(ISQLiteStorable)
+#@adapter(IGroup)
+class AdapterOfIGroupToISQLStorable(object):
     table="Groups"
     def __init__(self, group):
         self.group=group
@@ -130,9 +130,6 @@ class IGroupToISQLStorableAdapter(object):
 
 
 
-GSM=getGlobalSiteManager()
-GSM.registerAdapter(IGroupToISQLStorableAdapter)
-GSM.registerAdapter(IStudentToISQLiteStorableAdapter)
 
 def test_sore():
     storage=SQLiteStorage("university_test.db")
@@ -140,6 +137,8 @@ def test_sore():
 
 
 if __name__=="__main__":
+    from zope.configuration.xmlconfig import xmlconfig
+    xmlconfig("config.zcml")
     test_sore()
     print ("Ok")
     quit()
