@@ -249,10 +249,6 @@ def test_students(storage):
     _g1=storage.get(id_g1, Group)
     _g2=storage.get(id_g2, Group)
     assert _g1==g1
-    print ("Loaded  : ", _g2)
-    print ("Original: ", g2)
-
-    import pdb; pdb.set_trace()
     assert _g2==g2
 
     g2.disperse()
