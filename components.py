@@ -2,6 +2,9 @@ from interfaces import *
 from zope.interface import implementer
 from zope.component import adapter, getGlobalSiteManager
 
+from zope.configuration.xmlconfig import xmlconfig
+
+
 @implementer(IStudent)
 class Student(object):
     """Implements IStudent interface
@@ -212,8 +215,6 @@ GSM.registerAdapter(IStudentToIDictionaryStorableAdapter)
 
 
 
-
-
 def test_students(storage):
     assert IGroup.implementedBy(Group), "This class does not provide IGroup"
     assert IStudent.implementedBy(Student), "This class does not provide IGroup"
@@ -264,6 +265,7 @@ def test_storage():
     storage=DictionaryStorage({})
     test_students(storage)
 
+xmlconfig(open("config.zcml","r"))
 
 if __name__=="__main__":
     test_storage()

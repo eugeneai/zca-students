@@ -18,5 +18,15 @@
       provides="interfaces.ISQLiteStorage"
       name="storage"
       />
+  <adapter
+      provides="interfaces.IMVCListViewController"
+      for="interfaces.IGroup
+           interfaces.IGroupView"
+      factory="gui.GroupDialogController"
+      />
+  <utility
+      component="gui.builder"
+      provides="interfaces.IGroupView"
+      />
 
 </configure>

@@ -139,8 +139,6 @@ def test_sore():
 
 
 if __name__=="__main__":
-    from zope.configuration.xmlconfig import xmlconfig
-    xmlconfig(open("config.zcml","r"))
     print("""
 
 

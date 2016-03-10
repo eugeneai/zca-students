@@ -70,3 +70,17 @@ class ISQLiteStorage(Interface):
 class ISQLiteStorable(Interface):
     """
     """
+
+class IView(Interface):
+    """
+    """
+
+class IGroupView(IView):
+    pass
+
+class IMVCController(Interface):
+    """Defines interface for controllers."""
+
+class IMVCListViewController(IMVCController):
+    """Defines common VIEW controller for list-like
+    Views."""
