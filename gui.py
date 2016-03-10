@@ -20,12 +20,14 @@ builder.add_from_file("gui.glade")
 button_ok=builder.get_object("button_ok")
 group_dialog=builder.get_object("group_dialog")
 
+class Ui(object):
+    pass
 
 class GroupDialogController(object):
     """
     """
 
-    widget_names=("group_list")
+    widget_names=("app_window", "group_list")
 
     def __init__(self, model, builder):
         """
@@ -33,17 +35,23 @@ class GroupDialogController(object):
         self.model=model
         self.builder=builder
         builder.connect_signals(self)
-        self.setup()
-        view.show_all()
+        self.ui=Ui()
+        wn=self.__class__.widget_names
+        for name in wn:
+            setattr(self.ui, name, builder.get_object(name))
+        self.ui._main=builder.get_object(wn[0])
 
+        self.setup()
+        self.ui._main.show_all()
+        print (self.ui.app_window)
 
     def setup(self):
         pass
 
-    def on_button_ok_activate(self, button):
+    def on_button_ok_pressed(self, button):
         print ("Ok pressed")
 
-    def on_dialog_close(self, dialog):
+    def on_app_window_delete_event(self, window, data):
         Gtk.main_quit()
 
 
