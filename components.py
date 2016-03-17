@@ -79,6 +79,9 @@ class Student(object):
             return False
         return True
 
+    def print(self):
+        print ("Student {} doc: {}".format(self.name, self.doc))
+
 @implementer(IGroup)
 class Group(object):
     """Implements a group of students
@@ -135,6 +138,14 @@ class Group(object):
         if ss!=so:
             return False
         return True
+
+    def print(self):
+        print ("-"*20)
+        print ("Group: {}".format(self.name))
+        print ("its size: {}".format(len(self.students)))
+        for s in self.students:
+            s.print()
+
 
 @implementer(IDictionaryStorage)
 class DictionaryStorage(object):

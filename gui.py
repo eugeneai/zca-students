@@ -46,15 +46,44 @@ class GroupDialogController(object):
         print (self.ui.app_window)
 
     def setup(self):
-        pass
+        model=self.model
+        gl=self.ui.group_list     # GTK "model"
+        gl.clear()
+        for i,s in enumerate(model.students):
+            # gl.append([i+1, s.name, s.doc])
+            gl.append([i+1, s.name, s.doc, True, False])
 
     def on_button_ok_pressed(self, button):
-        print ("Ok pressed")
+        self.model.print()
 
     def on_app_window_delete_event(self, window, data):
         Gtk.main_quit()
 
+    def on_cellrenderertext_name_edited(self, r, path, text):
+        gl=self.ui.group_list[path][1]=text
+        path=int(path)
+        self.model.students[path].name=text
 
+    def on_cellrenderertext_doc_edited(self, r, path, text):
+        try:
+            t=int(text)
+        except ValueError:
+            t=0
+        gl=self.ui.group_list[path][2]=t
+        path=int(path)
+        self.model.students[path].doc=t
+
+    def on_delete_clicked(self, button):
+        print ("Try to delete")
+
+    def on_add_clicked(self, button):
+        #self.ui.group_list.append(
+        #    [len(self.model.students),
+        #     "", 0,
+        #     True, False])
+        s=Student(name="", doc=0, group=self.model)
+        # self.model.add_student(s)
+        self.setup()
 
 def tests():
     g1=Group("System Engineers")
