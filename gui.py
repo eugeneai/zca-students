@@ -3,15 +3,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from components import Group, Student
 from interfaces import *
-from zope.component import getMultiAdapter, queryMultiAdapter
+from zope.component import getMultiAdapter, queryMultiAdapter, getUtility
 from zope.interface import directlyProvides
-
-
-
-
-
-
-
 
 builder = Gtk.Builder()
 directlyProvides(builder, IGroupView)
@@ -27,7 +20,7 @@ class GroupDialogController(object):
     """
     """
 
-    widget_names=("app_window", "group_list")
+    widget_names=("app_window", "group_list", "group_name")
 
     def __init__(self, model, builder):
         """
@@ -46,6 +39,7 @@ class GroupDialogController(object):
         print (self.ui.app_window)
 
     def setup(self):
+        self.ui.group_name.set_text(self.model.name)
         model=self.model
         gl=self.ui.group_list     # GTK "model"
         gl.clear()
@@ -54,7 +48,11 @@ class GroupDialogController(object):
             gl.append([i+1, s.name, s.doc, True, False])
 
     def on_button_ok_pressed(self, button):
-        self.model.print()
+        #self.model.print()
+        storage=getUtility(IStorage, name="storage")
+        self.model.name=self.ui.group_name.get_text().strip()
+        key=storage.store(self.model)
+        print ("Key:", key)
 
     def on_app_window_delete_event(self, window, data):
         Gtk.main_quit()
@@ -85,6 +83,13 @@ class GroupDialogController(object):
         # self.model.add_student(s)
         self.setup()
 
+    def on_group_name_changed(self, editable):
+        pass
+        #print (editable)
+        #self.model.name=text.strip()
+        #self.ui.group_name.set_text(self.model.name)
+        #self.model.print()
+
 def tests():
     g1=Group("System Engineers")
     assert IGroup.providedBy(g1)
@@ -104,8 +109,17 @@ def tests():
     if controller==None:
         raise RuntimeError("not adapted")
 
+def real():
+    storage=getUtility(IStorage, name="storage")
+    group=storage.get(5, Group)
+    controller=queryMultiAdapter((group, builder), IMVCListViewController)
+    if controller==None:
+        raise RuntimeError("not adapted")
+
+
 if __name__=="__main__":
-    tests()
+    #tests()
+    real()
     Gtk.main()
     print ("Ok")
     quit()

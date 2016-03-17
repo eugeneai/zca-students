@@ -18,6 +18,11 @@
       provides="interfaces.ISQLiteStorage"
       name="storage"
       />
+  <utility
+      component="sql_storage.storage"
+      provides="interfaces.IStorage"
+      name="storage"
+      />
   <adapter
       provides="interfaces.IMVCListViewController"
       for="interfaces.IGroup
