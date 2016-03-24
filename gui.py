@@ -75,12 +75,7 @@ class GroupDialogController(object):
         print ("Try to delete")
 
     def on_add_clicked(self, button):
-        #self.ui.group_list.append(
-        #    [len(self.model.students),
-        #     "", 0,
-        #     True, False])
         s=Student(name="", doc=0, group=self.model)
-        # self.model.add_student(s)
         self.setup()
 
     def on_group_name_changed(self, editable):
