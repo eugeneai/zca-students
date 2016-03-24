@@ -1,10 +1,11 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from components import Group, Student
+from components import Group, Student, load_object
 from interfaces import *
-from zope.component import getMultiAdapter, queryMultiAdapter, getUtility
-from zope.interface import directlyProvides
+from zope.component import getMultiAdapter, queryMultiAdapter, getUtility, subscribers
+from zope.interface import directlyProvides, implementer
+
 
 builder = Gtk.Builder()
 directlyProvides(builder, IGroupView)
@@ -48,10 +49,8 @@ class GroupDialogController(object):
             gl.append([i+1, s.name, s.doc, True, False])
 
     def on_button_ok_pressed(self, button):
-        #self.model.print()
-        storage=getUtility(IStorage, name="storage")
-        self.model.name=self.ui.group_name.get_text().strip()
-        key=storage.store(self.model)
+        self.model.set_name(self.ui.group_name.get_text().strip())
+        key=subscribers([self.model], IEventStore)[0].store()
         print ("Key:", key)
 
     def on_app_window_delete_event(self, window, data):
@@ -60,7 +59,7 @@ class GroupDialogController(object):
     def on_cellrenderertext_name_edited(self, r, path, text):
         gl=self.ui.group_list[path][1]=text
         path=int(path)
-        self.model.students[path].name=text
+        self.model.get_student(path).set_name(text)
 
     def on_cellrenderertext_doc_edited(self, r, path, text):
         try:
@@ -69,7 +68,7 @@ class GroupDialogController(object):
             t=0
         gl=self.ui.group_list[path][2]=t
         path=int(path)
-        self.model.students[path].doc=t
+        self.model.get_student(path).set_doc(t)
 
     def on_delete_clicked(self, button):
         print ("Try to delete")
@@ -80,10 +79,6 @@ class GroupDialogController(object):
 
     def on_group_name_changed(self, editable):
         pass
-        #print (editable)
-        #self.model.name=text.strip()
-        #self.ui.group_name.set_text(self.model.name)
-        #self.model.print()
 
 def tests():
     g1=Group("System Engineers")
@@ -104,17 +99,28 @@ def tests():
     if controller==None:
         raise RuntimeError("not adapted")
 
+@implementer(IRemoteKey)
+class RemoteKey(object):
+    def __init__(self, key):
+        self.key=key
+
 def real():
-    storage=getUtility(IStorage, name="storage")
-    group=storage.get(5, Group)
+    group=load_object(5, Group)
+    edit(group)
+
+def edit(group):
     controller=queryMultiAdapter((group, builder), IMVCListViewController)
     if controller==None:
         raise RuntimeError("not adapted")
 
+def remote():
+    group=load_object("http://127.0.0.1:8080/5",Group,RemoteKey)
+    edit(group)
 
 if __name__=="__main__":
     #tests()
     real()
+    #remote()
     Gtk.main()
     print ("Ok")
     quit()
