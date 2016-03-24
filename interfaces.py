@@ -18,6 +18,18 @@ class IStudent(Interface):
     def belongs_to(group):
         """Checks wether the student belongs to a group"""
 
+    def get_name():
+        pass
+
+    def set_name(new_name):
+        pass
+
+    def get_doc():
+        pass
+
+    def set_doc():
+        pass
+
 class IGroup(Interface):
     """Defines shcema and methods for student group
     """
@@ -33,6 +45,15 @@ class IGroup(Interface):
 
     def disperse():
         """Remove all the student from the group"""
+
+    def get_name():
+        """Returns name of the group."""
+
+    def set_name(new_name):
+        """Sets new name for the group."""
+
+    def get_student(index):
+        """Return a student under index."""
 
 class IStorage(Interface):
     """Defines interface for components that
@@ -84,3 +105,20 @@ class IMVCController(Interface):
 class IMVCListViewController(IMVCController):
     """Defines common VIEW controller for list-like
     Views."""
+
+class IEvent(Interface):
+    pass
+
+class IEventStore(IEvent):
+    """This marker interface denotes
+    events, that emitted when an object
+    is to be stored into a database.
+    """
+class IEventLoad(IEvent):
+    pass
+
+class IKey(Interface):
+    """Defines interfaces for Key values"""
+
+class IRemoteKey(IKey):
+    """Marks a class to be a remote key."""

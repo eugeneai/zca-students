@@ -1,6 +1,6 @@
 from interfaces import *
 from zope.interface import implementer
-from zope.component import adapter, getGlobalSiteManager
+from zope.component import adapter, getGlobalSiteManager, getUtility, subscribers
 
 from zope.configuration.xmlconfig import xmlconfig
 
@@ -19,19 +19,10 @@ class Student(object):
         if stub:
             pass
         else:
-            self.name=name
-            self.doc=doc
+            self.set_name(name)
+            self.set_doc(doc)
             self.group=None
             self.move(group)
-
-    def __eq__(self, other):
-        if self.name != other.name:
-            return False
-
-        if self.doc != other.doc:
-            return False
-
-        return True
 
     def move(self, group):
         """Transfer the student to new group.
@@ -65,9 +56,9 @@ class Student(object):
         self.__rem_group()
 
     def __eq__(self, other):
-        if self.doc!=other.doc:
+        if self.get_doc()!=other.get_doc():
             return False
-        if self.name!=other.name:
+        if self.get_name()!=other.get_name():
             return False
         #if self.group!=other.group:
         #    return False
@@ -75,12 +66,26 @@ class Student(object):
         return True
 
     def __eq__(self, other):
-        if self.name!=other.name or self.doc!=other.doc:
+        if self.get_name()!=other.get_name() or self.get_doc()!=other.get_doc():
             return False
         return True
 
     def print(self):
-        print ("Student {} doc: {}".format(self.name, self.doc))
+        print ("Student {} doc: {}".format(self.get_name(), self.get_doc()))
+
+    def get_doc(self):
+        return self.doc
+
+    def set_doc(self, doc):
+        self.doc=doc
+        return doc
+
+    def get_name(self):
+        return self.name
+
+    def set_name(self, name):
+        self.name=name
+        return name
 
 @implementer(IGroup)
 class Group(object):
@@ -93,7 +98,7 @@ class Group(object):
         if stub:
             pass
         else:
-            self.name=name
+            self.set_name(name)
         self.students=[]
 
     def add_student(self, student):
@@ -131,20 +136,30 @@ class Group(object):
             self.remove_student(s)
 
     def __eq__(self, other):
-        if self.name!=other.name:
+        if self.get_name()!=other.get_name():
             return False
-        ss=set([(s.name,s.doc) for s in self.students])
-        so=set([(s.name,s.doc) for s in other.students])
+        ss=set([(s.get_name(),s.get_doc()) for s in self.students])
+        so=set([(s.get_name(),s.get_doc()) for s in other.students])
         if ss!=so:
             return False
         return True
 
+    def get_student(self, index):
+        return self.students[index]
+
+    def get_name(self):
+        return self.name
+
+    def set_name(self, name):
+        self.name=name
+        return name
+
     def print(self):
         print ("-"*20)
-        print ("Group: {}".format(self.name))
+        print ("Group: {}".format(self.get_name()))
         print ("its size: {}".format(len(self.students)))
-        for s in self.students:
-            s.print()
+        for i in range(len(self.students)):
+            self.get_student(i).print()
 
 
 @implementer(IDictionaryStorage)
@@ -213,6 +228,27 @@ class IStudentToIDictionaryStorableAdapter(object):
         storage.storage[obj_id]=self.student
         self.student.dict_id=obj_id
         return obj_id
+
+class GroupStorerAndLoader(object):
+    def __init__(self, group):
+        self.group=group
+
+    def store(self):
+        storage=getUtility(IStorage, name="storage")
+        return storage.store(self.group)
+
+    def load(self, cls):
+        storage=getUtility(IStorage, name="storage")
+        return storage.get(self.group.key, Group)
+
+@implementer(IKey)
+class Key(object):
+    def __init__(self, key):
+        self.key=key
+
+def load_object(key, cls, keycls=Key):
+    k=keycls(key)
+    return subscribers([k],IEventLoad)[0].load(cls)
 
 
 GSM=getGlobalSiteManager()
