@@ -33,5 +33,37 @@
       component="gui.builder"
       provides="interfaces.IGroupView"
       />
+  <subscriber
+      provides="interfaces.IEventStore"
+      factory="components.GroupStorerAndLoader"
+      for="interfaces.IGroup"
+      />
+  <subscriber
+      provides="interfaces.IEventLoad"
+      factory="components.GroupStorerAndLoader"
+      for="interfaces.IKey"
+      />
+<!--
+  <adapter
+      provides="interfaces.IStudent"
+      for="interfaces.IStudent"
+      factory="client.StudentProxy"
+      />
+  <adapter
+      provides="interfaces.IGroup"
+      for="interfaces.IGroup"
+      factory="client.GroupProxy"
+      />
+  <subscriber
+      provides="interfaces.IEventStore"
+      factory="client.RemoteObjectAccess"
+      for="interfaces.IGroup"
+      />
+  <subscriber
+      provides="interfaces.IEventLoad"
+      factory="client.RemoteObjectAccess"
+      for="interfaces.IRemoteKey"
+      />
 
+-->
 </configure>

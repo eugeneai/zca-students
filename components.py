@@ -1,6 +1,6 @@
 from interfaces import *
 from zope.interface import implementer
-from zope.component import adapter, getGlobalSiteManager
+from zope.component import adapter, getGlobalSiteManager, getUtility, subscribers
 
 from zope.configuration.xmlconfig import xmlconfig
 
@@ -23,15 +23,6 @@ class Student(object):
             self.doc=doc
             self.group=None
             self.move(group)
-
-    def __eq__(self, other):
-        if self.name != other.name:
-            return False
-
-        if self.doc != other.doc:
-            return False
-
-        return True
 
     def move(self, group):
         """Transfer the student to new group.
@@ -213,6 +204,27 @@ class IStudentToIDictionaryStorableAdapter(object):
         storage.storage[obj_id]=self.student
         self.student.dict_id=obj_id
         return obj_id
+
+class GroupStorerAndLoader(object):
+    def __init__(self, group):
+        self.group=group
+
+    def store(self):
+        storage=getUtility(IStorage, name="storage")
+        return storage.store(self.group)
+
+    def load(self, cls):
+        storage=getUtility(IStorage, name="storage")
+        return storage.get(self.group.key, Group)
+
+@implementer(IKey)
+class Key(object):
+    def __init__(self, key):
+        self.key=key
+
+def load_object(key, cls, keycls=Key):
+    k=keycls(key)
+    return subscribers([k],IEventLoad)[0].load(cls)
 
 
 GSM=getGlobalSiteManager()

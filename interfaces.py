@@ -84,3 +84,20 @@ class IMVCController(Interface):
 class IMVCListViewController(IMVCController):
     """Defines common VIEW controller for list-like
     Views."""
+
+class IEvent(Interface):
+    pass
+
+class IEventStore(IEvent):
+    """This marker interface denotes
+    events, that emitted when an object
+    is to be stored into a database.
+    """
+class IEventLoad(IEvent):
+    pass
+
+class IKey(Interface):
+    """Defines interfaces for Key values"""
+
+class IRemoteKey(IKey):
+    """Marks a class to be a remote key."""
