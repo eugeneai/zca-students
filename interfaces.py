@@ -101,3 +101,6 @@ class IKey(Interface):
 
 class IRemoteKey(IKey):
     """Marks a class to be a remote key."""
+
+class IModule(Interface):
+    """Marks a module"""

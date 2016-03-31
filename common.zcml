@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configure xmlns='http://namespaces.zope.org/zope'
+           i18n_domain="zope">
+  <include package="zope.component" file="meta.zcml" />
+  <adapter
+      for="interfaces.IGroup"
+      provides="interfaces.ISQLiteStorable"
+      factory="sql_storage.AdapterOfIGroupToISQLiteStorable"
+      />
+
+  <adapter
+      for="interfaces.IStudent"
+      provides="interfaces.ISQLiteStorable"
+      factory="sql_storage.AdapterOfIStudentToISQLiteStorable"
+      />
+  <utility
+      component="sql_storage.storage"
+      provides="interfaces.ISQLiteStorage"
+      name="storage"
+      />
+  <utility
+      component="sql_storage.storage"
+      provides="interfaces.IStorage"
+      name="storage"
+      />
+  <adapter
+      provides="interfaces.IMVCListViewController"
+      for="interfaces.IGroup
+           interfaces.IGroupView"
+      factory="gui.GroupDialogController"
+      />
+  <utility
+      component="gui.builder"
+      provides="interfaces.IGroupView"
+      />
+</configure>

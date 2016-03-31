@@ -5,12 +5,18 @@ i18n_domain="zope">
   <include file="common.zcml" />
   <subscriber
       provides="interfaces.IEventStore"
-      factory="components.GroupStorerAndLoader"
+      factory="remote.GroupStorerAndLoader"
       for="interfaces.IGroup"
       />
   <subscriber
       provides="interfaces.IEventLoad"
-      factory="components.GroupStorerAndLoader"
+      factory="remote.GroupStorerAndLoader"
       for="interfaces.IKey"
+      />
+
+  <utility
+      component="remote.rem_components"
+      provides="interfaces.IModule"
+      name="components"
       />
 </configure>

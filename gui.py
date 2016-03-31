@@ -1,7 +1,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from components import Group, Student, load_object
+from components import Group, Student, load_object, default_config
 from interfaces import *
 from zope.component import getMultiAdapter, queryMultiAdapter, getUtility, subscribers
 from zope.interface import directlyProvides, implementer
@@ -108,23 +108,31 @@ class RemoteKey(object):
     def __init__(self, key):
         self.key=key
 
-def real():
-    group=load_object(5, Group)
-    edit(group)
-
 def edit(group):
-    controller=queryMultiAdapter((group, builder), IMVCListViewController)
+    #if not IGroup.providedBy(group):
+    #directlyProvides(IGroup, group)
+    #controller=queryMultiAdapter((group, builder), IMVCListViewController)
+    controller=GroupDialogController(group, builder)
     if controller==None:
         raise RuntimeError("not adapted")
 
-def remote():
-    group=load_object("http://127.0.0.1:8080/5",Group,RemoteKey)
+def common():
+    group=load_object(5, Group)
     edit(group)
+
+def real():
+    default_config()
+    common()
+
+def remote():
+    import remote
+    remote.register_components()
+    common()
 
 if __name__=="__main__":
     #tests()
-    real()
-    #remote()
+    #real()
+    remote()
     Gtk.main()
     print ("Ok")
     quit()

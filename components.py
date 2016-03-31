@@ -288,9 +288,11 @@ def test_storage():
     storage=DictionaryStorage({})
     test_students(storage)
 
-xmlconfig(open("config.zcml","r"))
+def default_config():
+    xmlconfig(open("config.zcml","r"))
 
 if __name__=="__main__":
+    default_config()
     test_storage()
     print("Ok")
     quit()
