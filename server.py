@@ -7,7 +7,7 @@ from interfaces import *
 
 # Restrict to a particular path.
 class RequestHandler(SimpleXMLRPCRequestHandler):
-    rpc_paths = ('/5',)
+    rpc_paths = ('/RPC2',)
 
 SERVER=("localhost", 8080)
 

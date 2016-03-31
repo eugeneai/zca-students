@@ -12,7 +12,15 @@ class RemoteObjectAccess(object):
 
 @implementer(IStudent)
 class StudentProxy(object):
-    pass
+    def __init__(self, sobj):
+        """sobj is a server proxy object"""
+        self.sobj=sobj
+
+    def set_name(self, name):
+        return self.sobj.set_name(name)
+
+    def get_name(self):
+        return self.sobj.get_name()
 
 @implementer(IGroup)
 class GroupProxy(object):
